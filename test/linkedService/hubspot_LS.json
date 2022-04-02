@@ -1,0 +1,19 @@
+{
+	"name": "hubspot_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"hapikey": {
+				"type": "string",
+				"defaultValue": "d8793df7-67be-4b9c-8673-85dc4ea46d51"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://api.hubapi.com/crm/v3/objects/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

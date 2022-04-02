@@ -1,0 +1,9 @@
+{
+	"name": "OAC-DW-DF",
+	"location": "australiaeast",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f07c7b77-f9c2-4aa6-b332-51cb71419e21",
+		"tenantId": "00611efb-40ef-4cb6-a3a7-8ff68646a697"
+	}
+}

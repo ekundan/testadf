@@ -1,0 +1,436 @@
+{
+	"name": "get_all_centers",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get-Bearer-Token",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://auth.myxplor.com/api/v1/auth",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"user": "OAC-Data-API",
+						"password": "Xplor123!"
+					},
+					"disableCertValidation": true
+				}
+			},
+			{
+				"name": "Set Token",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get-Bearer-Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "token",
+					"value": {
+						"value": "@activity('Get-Bearer-Token').output.data.token",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "get-centers-by-providers",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Set Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://office.myxplor.com/api/enterprise/centers/by_provider/3146?page=1",
+					"method": "GET",
+					"headers": {
+						"x-api-key": {
+							"value": "@variables('x-api-key')",
+							"type": "Expression"
+						},
+						"Authorization": {
+							"value": "@concat('Bearer ',variables('token'))",
+							"type": "Expression"
+						},
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"user": "OAC-Data-API",
+						"password": "Xplor123!"
+					},
+					"disableCertValidation": true
+				}
+			},
+			{
+				"name": "Foreach-to-fetch-all-page",
+				"description": "To fetch all paginated records from Open API call",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "get-centers-by-providers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(1,activity('get-centers-by-providers').output.pagination.pages)",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"x-api-key": {
+											"value": "@variables('x-api-key')",
+											"type": "Expression"
+										},
+										"Authorization": {
+											"value": "@concat('Bearer ', variables('token'))",
+											"type": "Expression"
+										}
+									},
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "RestSink",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": 10,
+									"requestMethod": "POST",
+									"writeBatchSize": 10000,
+									"httpCompressionType": "none",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['name']"
+											},
+											"sink": {
+												"name": "name",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['account_manager']"
+											},
+											"sink": {
+												"name": "account_manager",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['care_type']"
+											},
+											"sink": {
+												"name": "care_type",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['submission_type']"
+											},
+											"sink": {
+												"name": "submission_type",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['capacity']"
+											},
+											"sink": {
+												"name": "capacity",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['legacy_id']"
+											},
+											"sink": {
+												"name": "legacy_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['group']"
+											},
+											"sink": {
+												"name": "group",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['timezone']"
+											},
+											"sink": {
+												"name": "timezone",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['ccs_enabled']"
+											},
+											"sink": {
+												"name": "ccs_enabled",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['contact']['fullname']"
+											},
+											"sink": {
+												"name": "fullname",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['contact']['login']"
+											},
+											"sink": {
+												"name": "login",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['contact']['email']"
+											},
+											"sink": {
+												"name": "email",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['contact']['phone']"
+											},
+											"sink": {
+												"name": "phone",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['line1']"
+											},
+											"sink": {
+												"name": "line1",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['line2']"
+											},
+											"sink": {
+												"name": "line2",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['suburb']"
+											},
+											"sink": {
+												"name": "suburb",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['state']"
+											},
+											"sink": {
+												"name": "state",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['postcode']"
+											},
+											"sink": {
+												"name": "postcode",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['country']"
+											},
+											"sink": {
+												"name": "country",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['longitude']"
+											},
+											"sink": {
+												"name": "longitude",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['address']['latitude']"
+											},
+											"sink": {
+												"name": "latitude",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['third_party']['proda_id']"
+											},
+											"sink": {
+												"name": "proda_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['third_party']['acecqa_id']"
+											},
+											"sink": {
+												"name": "acecqa_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['timestamp']['created']"
+											},
+											"sink": {
+												"name": "created",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['timestamp']['updated']"
+											},
+											"sink": {
+												"name": "updated",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['data']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "RestResource1",
+									"type": "DatasetReference",
+									"parameters": {
+										"QueryParameters": {
+											"value": "centers/by_provider/3146?page=@{item()})",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "xplor_centers",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"token": {
+				"type": "String"
+			},
+			"x-api-key": {
+				"type": "String",
+				"defaultValue": "Aq0SsrBho1EVSIL2Kd5jrfUUtRczjLLadElUbu4c"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-26T18:44:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

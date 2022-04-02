@@ -1,0 +1,14 @@
+{
+	"name": "Xplor_office_Open_API",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "centers by provider",
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://office.myxplor.com/api/enterprise/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

@@ -1,0 +1,147 @@
+{
+	"name": "XPLOR_center_by_Provid_storage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "centers.json",
+				"container": "devtest"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"pagination": {
+					"type": "object",
+					"properties": {
+						"perpage": {
+							"type": "integer"
+						},
+						"page": {
+							"type": "integer"
+						},
+						"total": {
+							"type": "integer"
+						},
+						"pages": {
+							"type": "integer"
+						}
+					}
+				},
+				"data": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer"
+							},
+							"name": {
+								"type": "string"
+							},
+							"account_manager": {
+								"type": "string"
+							},
+							"care_type": {
+								"type": "string"
+							},
+							"submission_type": {
+								"type": "string"
+							},
+							"capacity": {
+								"type": "integer"
+							},
+							"legacy_id": {
+								"type": "string"
+							},
+							"group": {
+								"type": "string"
+							},
+							"timezone": {
+								"type": "string"
+							},
+							"ccs_enabled": {
+								"type": "null"
+							},
+							"contact": {
+								"type": "object",
+								"properties": {
+									"fullname": {
+										"type": "string"
+									},
+									"login": {
+										"type": "string"
+									},
+									"email": {
+										"type": "string"
+									},
+									"phone": {
+										"type": "string"
+									}
+								}
+							},
+							"address": {
+								"type": "object",
+								"properties": {
+									"line1": {
+										"type": "string"
+									},
+									"line2": {
+										"type": "string"
+									},
+									"suburb": {
+										"type": "string"
+									},
+									"state": {
+										"type": "string"
+									},
+									"postcode": {
+										"type": "string"
+									},
+									"country": {
+										"type": "string"
+									},
+									"longitude": {
+										"type": "string"
+									},
+									"latitude": {
+										"type": "string"
+									}
+								}
+							},
+							"third_party": {
+								"type": "object",
+								"properties": {
+									"proda_id": {
+										"type": "string"
+									},
+									"acecqa_id": {
+										"type": "string"
+									}
+								}
+							},
+							"timestamp": {
+								"type": "object",
+								"properties": {
+									"created": {
+										"type": "string"
+									},
+									"updated": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

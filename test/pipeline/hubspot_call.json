@@ -1,0 +1,253 @@
+{
+	"name": "hubspot_call",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('after'),null )",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data2",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "get hubspotcontact",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "@{concat('contacts?archived=false&limit=100&&hapikey=','d8793df7-67be-4b9c-8673-85dc4ea46d51','&after=',pipeline().parameters.after)}"
+								},
+								{
+									"name": "Destination",
+									"value": "devtest//contact.csv"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['createdate']"
+											},
+											"sink": {
+												"name": "createdate",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['email']"
+											},
+											"sink": {
+												"name": "email",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['firstname']"
+											},
+											"sink": {
+												"name": "firstname",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['hs_object_id']"
+											},
+											"sink": {
+												"name": "hs_object_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['lastmodifieddate']"
+											},
+											"sink": {
+												"name": "lastmodifieddate",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['properties']['lastname']"
+											},
+											"sink": {
+												"name": "lastname",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['createdAt']"
+											},
+											"sink": {
+												"name": "createdAt",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['updatedAt']"
+											},
+											"sink": {
+												"name": "updatedAt",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['archived']"
+											},
+											"sink": {
+												"name": "archived",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['results']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "hubspot_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"hapiKey": "d8793df7-67be-4b9c-8673-85dc4ea46d51",
+										"after": {
+											"value": "@variables('after')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "contactscsv",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "set after variable",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy data2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "after",
+								"value": {
+									"value": "@activity('get hubspotcontact').output.paging.next.after",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "get hubspotcontact",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@concat('https://api.hubapi.com/crm/v3/objects/contacts?archived=false&limit=100&&hapikey=',variables('hapikey'),'&after=',variables('after'))",
+									"type": "Expression"
+								},
+								"method": "GET",
+								"body": {
+									"user": "OAC-Data-API",
+									"password": "Xplor123!"
+								},
+								"disableCertValidation": true
+							}
+						}
+					],
+					"timeout": "7.00:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"after": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"variables": {
+			"hapikey": {
+				"type": "String",
+				"defaultValue": "d8793df7-67be-4b9c-8673-85dc4ea46d51"
+			},
+			"after": {
+				"type": "String",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-26T20:59:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

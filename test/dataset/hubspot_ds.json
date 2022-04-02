@@ -1,0 +1,32 @@
+{
+	"name": "hubspot_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "hubspot_LS",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"hapikey": "d8793df7-67be-4b9c-8673-85dc4ea46d51"
+			}
+		},
+		"parameters": {
+			"hapiKey": {
+				"type": "string",
+				"defaultValue": "d8793df7-67be-4b9c-8673-85dc4ea46d51"
+			},
+			"after": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat('contacts?archived=false&limit=100&&hapikey=',dataset().hapiKey,'&after=',dataset().after)",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

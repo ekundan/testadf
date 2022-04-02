@@ -1,0 +1,14 @@
+{
+	"name": "Xplor_OAC_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "This linked service connect to Xplor API to fetch OAC entity.",
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://auth.myxplor.com/",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
