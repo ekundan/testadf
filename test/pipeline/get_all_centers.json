@@ -29,6 +29,7 @@
 			},
 			{
 				"name": "Set Token",
+				"description": "test",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -109,6 +110,7 @@
 					"activities": [
 						{
 							"name": "Copy data1",
+							"description": "test",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
